@@ -752,6 +752,44 @@ html,body{overflow-x:clip}
 .picked .addlab{margin-left:auto;font-size:13px;font-weight:700;color:var(--sig);text-decoration:none;border:1px solid var(--sig);padding:6px 12px;white-space:nowrap}
 .picked .addlab:hover{background:rgba(255,75,31,.12)}
 @media (max-width:640px){.picked>li{padding:14px 12px 16px!important}.picked .sel,.picked .rq{margin-left:0}.picked>li.empty{flex-wrap:wrap}.picked .addlab{margin-left:36px}}
+
+/* apply split (B안) */
+#apply .panel{width:min(1040px,100%)}
+#apply .p-body.ap-split{display:grid;grid-template-columns:210px 1fr;padding:0!important;overflow:hidden}
+#apply .apnav{border-right:1px solid var(--line);padding:16px 0 24px;overflow-y:auto;background:rgba(0,0,0,.18)}
+#apply .apnav .sec{display:block;font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--meta);padding:14px 20px 6px}
+#apply .apnav .it{display:block;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;color:var(--text);font:inherit;padding:11px 18px 11px 17px;cursor:pointer;text-decoration:none}
+#apply .apnav .it:hover{background:rgba(242,242,240,.04)}
+#apply .apnav .it.on{background:rgba(242,242,240,.07);border-left-color:var(--sig)}
+#apply .apnav .it .t{display:block;font-size:11.5px;color:var(--meta)}#apply .apnav .it.on .t{color:var(--sig)}
+#apply .apnav .it b{display:block;font-size:14px;font-weight:800;line-height:1.35;margin:1px 0 3px}
+#apply .apnav .it .p{display:block;font-size:12px;font-weight:700}#apply .apnav .it .p.ok{color:#7fd6a6}#apply .apnav .it .p.no{color:#ff8b6b}
+#apply .apnav .it.add b{color:var(--sig);font-weight:700;font-size:13px}
+#apply .apr{display:block!important;align-content:start;overflow-y:auto;padding:22px 30px 40px}
+#apply .apr .pane{display:none}
+#apply .apr[data-v="lab"] .pane-lab,#apply .apr[data-v="co"] .pane-co,#apply .apr[data-v="ok"] .pane-ok{display:block}
+#apply .ph-h{margin-bottom:18px}#apply .ph-h .k{display:block;font-size:12px;color:var(--meta)}#apply .ph-h b{display:block;font-size:21px;font-weight:800;margin:3px 0 4px}#apply .ph-h small{display:block;font-size:13px;color:var(--muted)}
+#apply .ph-h .pg{display:block;height:4px;background:var(--line);margin:10px 0 8px}#apply .ph-h .pg i{display:block;height:4px;background:var(--sig);transition:width .2s}
+#apply #picked>li{display:none!important}#apply #picked>li.cur{display:flex!important;border:0!important;border-left:0!important;background:none;padding:0!important;margin:0}
+#apply #picked>li.cur>.rk,#apply #picked>li.cur>.nm{display:none}
+#apply #picked>li.cur>.ctl{margin-left:auto}
+#apply #picked .sel,#apply #picked .rq{margin-left:0!important}
+#apply #picked .sel{border-top:0;margin-top:0;padding-top:0}
+#apply .capnote{margin-top:16px}
+#apply .pnext{display:flex;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+#apply .btn.g{background:transparent;color:var(--text);border:1px solid rgba(242,242,240,.4)}#apply .btn.g:hover{border-color:var(--sig);color:var(--sig)}
+#apply .err:not(:empty){border:1px solid var(--sig);background:rgba(255,75,31,.08);padding:10px 12px;margin:0 0 16px}
+#apply .stp{display:none}
+@media (max-width:760px){
+ #apply .p-body.ap-split{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+ #apply .apnav{display:flex;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:1px solid var(--line);padding:0}
+ #apply .apnav .sec{display:none}
+ #apply .apnav .it{flex:none;width:auto;max-width:150px;border-left:0;border-bottom:3px solid transparent;padding:10px 14px}
+ #apply .apnav .it.on{border-bottom-color:var(--sig)}
+ #apply .apnav .it b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #apply .apr{padding:18px 16px 32px}
+}
+#apply .oksum{list-style:none;margin:0 0 20px;padding:0;border-top:1px solid var(--line)}#apply .oksum li{display:grid;grid-template-columns:56px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}#apply .oksum span{color:var(--meta);font-size:12.5px}#apply .oksum em{font-style:normal;font-size:12.5px;font-weight:700}#apply .oksum em.ok{color:#7fd6a6}#apply .oksum em.no{color:#ff8b6b}
 </style></head><body><header class="mast"><div class="in"><a class="wordmark" href="#top">Lab–Biz Tech Meetup</a>
 <nav aria-label="페이지 메뉴"><a href="#program">진행 순서</a><a href="#how">참여 방법</a><a href="#labs">참여 연구실</a></nav>
 <a class="btn p sm" href="#apply">상담 신청 <span class="tally" data-count>0/3</span></a></div></header>
@@ -816,11 +854,19 @@ html,body{overflow-x:clip}
   <div class="scrim" data-aclose></div>
   <aside class="panel" role="dialog" aria-modal="true" aria-labelledby="a-title">
     <div class="p-head"><div class="row"><span class="eyebrow mono">APPLY</span><button class="close" data-aclose aria-label="닫기">×</button></div><h2 id="a-title">상담 신청</h2><div class="who">희망 연구실을 1~3순위로 담고 신청서를 작성해 주세요.</div></div>
-    <div class="p-body"><div class="apply-body">
-        <div><p class="closedn" id="closedn" hidden></p><div class="stp"><span class="n">1</span><div><b>희망 연구실과 상담 내용</b><small>최대 3곳 · 연구실마다 관심 분야, 관심 특허, 상담할 내용을 적어 주세요</small></div></div><ul class="picked" id="picked"></ul><p class="capnote">연구실별 상담은 최대 4건입니다. 신청이 4건 차면 해당 연구실은 접수가 마감됩니다.</p></div>
-        <div>
-          <form id="form" novalidate>
-            <div class="stp"><span class="n">2</span><div><b>기업 정보</b><small>담당자 연락처와 기업 현황은 한 번만 적으면 됩니다</small></div></div>
+    <div class="p-body ap-split">
+      <nav class="apnav" id="apnav" aria-label="신청서 순서"></nav>
+      <form id="form" class="apr" novalidate data-v="lab">
+        <p class="closedn" id="closedn" hidden></p>
+        <div class="err" id="err" role="alert"></div>
+        <section class="pane pane-lab">
+          <div class="ph-h" id="labHead"></div>
+          <ul class="picked" id="picked"></ul><p class="capnote">연구실별 상담은 최대 4건입니다. 신청이 4건 차면 해당 연구실은 접수가 마감됩니다.</p>
+          <div class="pnext"><button type="button" class="btn g" id="labNext">다음 →</button></div>
+        </section>
+        <section class="pane pane-co">
+          <div class="ph-h"><span class="k">기업 정보</span><b>담당자 연락처와 기업 현황</b><small>한 번만 적으면 신청한 모든 연구실에 함께 전달됩니다.</small></div>
+
             <div class="frow">
               <label class="f"><span>기업명 <span class="req">*</span></span><input id="f-co" required autocomplete="organization"></label>
               <label class="f"><span>업종</span><input id="f-biz" placeholder="예: 화학소재 제조"></label>
@@ -838,18 +884,22 @@ html,body{overflow-x:clip}
               </div>
             </fieldset>
             <label class="f"><span>기업 현황 <span class="req">*</span> <em class="fmin">최소 50자</em></span><textarea id="f-memo" required rows="4" placeholder="우리 회사가 지금 무엇을 하고 있는지 적어 주세요. 예: 주요 제품·고객, 쓰고 있는 기술·공정, 연구 인력·설비(기업부설연구소 등). 연구실과 상담할 내용은 위 희망 연구실마다 따로 적어 주세요."></textarea><small class="fcount" id="f-memo-n" aria-live="polite">0자 / 최소 50자</small><small class="fnote">작성하신 기업 정보와 담당자 성명·직위, 기업 현황, 연구실별 상담 내용은 상담 준비를 위해 신청하신 연구실에 미리 전달됩니다. 영업비밀에 해당하는 내용은 적지 말고 상담 자리에서 말씀해 주세요.</small></label>
-            <div class="stp"><span class="n">3</span><div><b>동의 후 신청</b><small></small></div></div>
-            <label class="consent"><input type="checkbox" id="f-agree"> <span>상담 매칭과 일정 안내를 위해 위 정보를 수집·이용하는 데 동의합니다. (수집 항목: 기업명, 업종, 주력 제품·사업, 담당자 성명·연락처·이메일, 기업 현황, 연구실별 상담 내용 / 이용 범위: 기업 정보, 담당자 성명·직위, 기업 현황, 연구실별 상담 내용은 신청한 연구실에 상담 준비용으로 제공 / 보유 기간: 행사 종료 후 1년)</span></label>
-            <div class="err" id="err" role="alert"></div>
+            
+          <div class="pnext"><button type="button" class="btn g" data-go="ok">다음: 동의·신청 →</button></div>
+        </section>
+        <section class="pane pane-ok">
+          <div class="ph-h"><span class="k">동의·신청</span><b>확인 후 신청</b><small>신청하기를 누르면 빠진 항목이 있는지 확인한 뒤 접수됩니다.</small></div><ul class="oksum" id="okSum"></ul>
+          <label class="consent"><input type="checkbox" id="f-agree"> <span>상담 매칭과 일정 안내를 위해 위 정보를 수집·이용하는 데 동의합니다. (수집 항목: 기업명, 업종, 주력 제품·사업, 담당자 성명·연락처·이메일, 기업 현황, 연구실별 상담 내용 / 이용 범위: 기업 정보, 담당자 성명·직위, 기업 현황, 연구실별 상담 내용은 신청한 연구실에 상담 준비용으로 제공 / 보유 기간: 행사 종료 후 1년)</span></label>
+            
             <div><button class="btn p" type="submit" id="submitBtn">신청하기</button><p class="fcontact">문의: <span data-contact></span></p></div>
             <div class="result" id="result" hidden>
               <p id="rhead" class="rhead"></p><pre id="summary"></pre>
               <div class="cta"><button class="btn sm" type="button" id="copy">신청 내용 복사</button><span class="rc" id="copied"></span></div>
               <p class="hint" id="rhint">접수처 연결 전에는 복사한 신청 내용을 행사 담당자에게 전달해 주세요.</p>
             </div>
-          </form>
-        </div>
-      </div>
+          
+        </section>
+      </form>
     </div>
   </aside>
 </div>
@@ -1099,13 +1149,46 @@ function renderGrid(){
   }).join("");
   observe($("#grid"));
 }
+let APV = "lab:";
+const labDone = id => selOf(id).f.length > 0 && reqLen(REQ[id]) >= REQ_MIN;
+const coDone = () => ["#f-co","#f-prod","#f-name","#f-tel","#f-mail"].every(s => $(s).value.trim()) && memoLen() >= MEMO_MIN;
+function renderNav(){
+  const n = $("#apnav"); if (!n) return;
+  const it = (key, top, title, st, cls) => `<button type="button" class="it${APV === key ? " on" : ""}" data-go="${key}"><span class="t">${top}</span><b>${title}</b>${st ? `<span class="p ${cls}">${st}</span>` : ""}</button>`;
+  n.innerHTML = `<span class="sec">희망 연구실</span>` +
+    picked.map((id, i) => it("lab:" + id, `${i+1}순위`, esc(byId(id).lab), labDone(id) ? "✓ 작성 완료" : (selOf(id).f.length || reqLen(REQ[id]) ? "● 작성 중" : "● 미작성"), labDone(id) ? "ok" : "no")).join("") +
+    (picked.length < MAX ? `<a class="it add" href="#labs" data-golabs><b>+ ${picked.length ? `${picked.length+1}순위 추가` : "연구실 담기"}</b><span class="t">${picked.length ? "선택" : "1곳 이상 필수"}</span></a>` : "") +
+    `<span class="sec">기업</span>` + it("co", "", "기업 정보", coDone() ? "✓ 작성 완료" : "● 미작성", coDone() ? "ok" : "no") +
+    it("ok", "", "동의·신청", $("#f-agree").checked ? "✓ 동의함" : "", "ok");
+}
+function showPane(){
+  const f = $("#form"); if (!f) return;
+  const v = APV.startsWith("lab:") ? "lab" : APV; f.dataset.v = v;
+  const cur = APV.startsWith("lab:") ? APV.slice(4) : "";
+  document.querySelectorAll("#picked > li[data-lab]").forEach(li => li.classList.toggle("cur", li.dataset.lab === cur));
+  const lh = $("#labHead");
+  if (lh){ if (cur){ const l = byId(cur), i = picked.indexOf(cur); const done = picked.filter(labDone).length; lh.innerHTML = `<span class="k">${i+1}순위 · ${l.id} · ${esc(l.prof)} · ${esc(l.org)}</span><b>${esc(l.lab)}</b><span class="pg"><i style="width:${Math.round(done / picked.length * 100)}%"></i></span><small>희망 연구실 ${picked.length}곳 중 ${done}곳 작성 완료</small>`; } else lh.innerHTML = `<span class="k">희망 연구실</span><b>아직 담은 연구실이 없습니다</b><small>참여 연구실에서 「+ 담기」를 눌러 최대 3곳까지 담아 주세요.</small><p style="margin-top:14px"><a class="btn p" href="#labs" data-golabs>참여 연구실 보기 →</a></p>`; }
+  const nx = $("#labNext"); if (nx){ const i = picked.indexOf(cur); nx.hidden = !cur; nx.textContent = i >= 0 && i < picked.length - 1 ? `다음 연구실: ${byId(picked[i+1]).lab} →` : "다음: 기업 정보 →"; nx.dataset.go = i >= 0 && i < picked.length - 1 ? "lab:" + picked[i+1] : "co"; }
+  renderNav(); renderOkSum();
+}
+function renderOkSum(){
+  const u = $("#okSum"); if (!u) return;
+  u.innerHTML = picked.map((id, i) => `<li><span>${i+1}순위</span><b>${esc(byId(id).lab)}</b><em class="${labDone(id) ? "ok" : "no"}">${labDone(id) ? "✓ 작성 완료" : "● 작성이 덜 됨"}</em></li>`).join("") + `<li><span>기업</span><b>기업 정보</b><em class="${coDone() ? "ok" : "no"}">${coDone() ? "✓ 작성 완료" : "● 작성이 덜 됨"}</em></li>`;
+}
+function goPane(key){ APV = key; showPane(); const b = document.querySelector("#apply .p-body"); if (b) b.scrollTop = 0; const f = $("#form"); if (f) f.scrollTop = 0; }
+document.addEventListener("click", e => { const g = e.target.closest && e.target.closest("button[data-go]"); if (!g) return; e.preventDefault(); $("#err").textContent = ""; goPane(g.dataset.go); });
+document.addEventListener("input", () => { if (!$("#apply").hidden){ renderNav(); renderOkSum(); } });
+document.addEventListener("change", () => { if (!$("#apply").hidden) setTimeout(() => { renderNav(); renderOkSum(); }, 0); });
 function renderPicked(){
   document.querySelectorAll("[data-count]").forEach(e => e.textContent = `${picked.length}/${MAX}`);
-  const rows = picked.map((id, i) => { const l = byId(id); const rq = REQ[id] || ""; return `<li><span class="rk">${i+1}</span><div class="nm"><b>${esc(l.lab)}</b><span>${l.id} · ${esc(l.prof)} · ${esc(l.org)}</span></div>
+  const rows = picked.map((id, i) => { const l = byId(id); const rq = REQ[id] || ""; return `<li data-lab="${id}"><span class="rk">${i+1}</span><div class="nm"><b>${esc(l.lab)}</b><span>${l.id} · ${esc(l.prof)} · ${esc(l.org)}</span></div>
     <div class="ctl"><button class="icon" type="button" data-up="${i}" aria-label="순위 올리기" ${i === 0 ? "disabled" : ""}>↑</button><button class="icon" type="button" data-down="${i}" aria-label="순위 내리기" ${i === picked.length-1 ? "disabled" : ""}>↓</button><button class="icon" type="button" data-rm="${id}" aria-label="빼기">×</button></div>${selBlock(id)}<label class="rq"><span><span class="sn">③</span>이 연구실과 상담할 내용 <span class="req">*</span> <em>최소 ${REQ_MIN}자</em><small data-reqn="${id}" class="${reqLen(rq) >= REQ_MIN ? "ok" : ""}">${reqLen(rq)}자</small></span><textarea data-req="${id}" rows="3" placeholder="이 연구실과 무엇을 하고 싶은지 적어 주세요. 예: 해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 결과(기술이전·공동연구·자문 등)">${esc(rq)}</textarea></label></li>`; });
   for (let i = picked.length; i < MAX; i++) rows.push(`<li class="empty"><span class="rk">${i+1}</span><span class="slot">${i+1}순위 연구실을 더 담을 수 있습니다 <small>(선택)</small></span><a class="addlab" href="#labs" data-golabs>+ 연구실 둘러보기</a></li>`);
   $("#picked").innerHTML = rows.join("");
   store.set("lbm-picked", picked);
+  if (APV.startsWith("lab:") && !picked.includes(APV.slice(4))) APV = picked.length ? "lab:" + picked[0] : "lab:";
+  if (APV === "lab:" && picked.length) APV = "lab:" + picked[0];
+  showPane();
 }
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-star]"); if (!b) return;
@@ -1238,14 +1321,14 @@ $("#form").addEventListener("submit", async e => {
   e.preventDefault();
   if (isClosed()){ applyMeta(); return; }
   const need = [["#f-co","기업명"],["#f-prod","주력 제품·사업"],["#f-name","담당자 성명"],["#f-tel","연락처"],["#f-mail","이메일"],["#f-memo","기업 현황"]].filter(([s]) => !$(s).value.trim()).map(([,n]) => n);
-  if (!picked.length){ $("#err").textContent = "희망 연구실을 1곳 이상 담아 주세요. 연구실의 「+ 담기」를 누르면 됩니다."; return; }
-  if (need.length){ $("#err").textContent = `${need.join(", ")}을(를) 입력해 주세요.`; return; }
+  if (!picked.length){ $("#err").textContent = "희망 연구실을 1곳 이상 담아 주세요. 연구실의 「+ 담기」를 누르면 됩니다."; goPane("lab:"); return; }
   const noFld = picked.filter(id => !selOf(id).f.length);
-  if (noFld.length){ $("#err").textContent = `연구실마다 관심 분야를 1개 이상 골라 주세요: ${noFld.map(id => byId(id).lab).join(", ")}.`; const t = document.querySelector(`[data-fd^="${noFld[0]}|"]`); if (t) t.focus(); return; }
+  if (noFld.length){ goPane("lab:" + noFld[0]); $("#err").textContent = `연구실마다 관심 분야를 1개 이상 골라 주세요: ${noFld.map(id => byId(id).lab).join(", ")}.`; const t = document.querySelector(`[data-fd^="${noFld[0]}|"]`); if (t) t.focus(); return; }
   const shortReq = picked.filter(id => reqLen(REQ[id]) < REQ_MIN);
-  if (shortReq.length){ $("#err").textContent = `연구실별 상담 내용을 ${REQ_MIN}자 이상 적어 주세요: ${shortReq.map(id => byId(id).lab).join(", ")}. 해결하고 싶은 문제와 기대하는 결과를 적어 주시면 연구실이 상담을 미리 준비할 수 있습니다.`; const t = document.querySelector(`[data-req="${shortReq[0]}"]`); if (t) t.focus(); return; }
-  if (memoLen() < MEMO_MIN){ $("#err").textContent = `기업 현황을 ${MEMO_MIN}자 이상 적어 주세요(지금 ${memoLen()}자). 주요 제품, 쓰고 있는 기술·공정, 연구 인력·설비 등을 적어 주세요.`; $("#f-memo").focus(); return; }
-  if (!/^\S+@\S+\.\S+$/.test($("#f-mail").value.trim())){ $("#err").textContent = "이메일 주소 형식을 확인해 주세요."; return; }
+  if (shortReq.length){ goPane("lab:" + shortReq[0]); $("#err").textContent = `연구실별 상담 내용을 ${REQ_MIN}자 이상 적어 주세요: ${shortReq.map(id => byId(id).lab).join(", ")}. 해결하고 싶은 문제와 기대하는 결과를 적어 주시면 연구실이 상담을 미리 준비할 수 있습니다.`; const t = document.querySelector(`[data-req="${shortReq[0]}"]`); if (t) t.focus(); return; }
+  if (need.length){ goPane("co"); $("#err").textContent = `${need.join(", ")}을(를) 입력해 주세요.`; return; }
+  if (memoLen() < MEMO_MIN){ goPane("co"); $("#err").textContent = `기업 현황을 ${MEMO_MIN}자 이상 적어 주세요(지금 ${memoLen()}자). 주요 제품, 쓰고 있는 기술·공정, 연구 인력·설비 등을 적어 주세요.`; $("#f-memo").focus(); return; }
+  if (!/^\S+@\S+\.\S+$/.test($("#f-mail").value.trim())){ goPane("co"); $("#err").textContent = "이메일 주소 형식을 확인해 주세요."; return; }
   if (!$("#f-agree").checked){ $("#err").textContent = "개인정보 수집·이용에 동의해야 신청할 수 있습니다."; return; }
   const btn0 = e.submitter || $("#form button[type=submit]");
   if (SHEET_URL){ btn0.disabled = true; btn0.textContent = "확인 중…"; await loadCounts(); btn0.disabled = false; btn0.textContent = "신청하기"; }
@@ -1297,7 +1380,7 @@ $("#copy").addEventListener("click", async () => {
 });
 
 /* apply drawer */
-function openApply(){ $("#apply").hidden = false; document.body.style.overflow = "hidden"; if (!$("#detail").hidden) $("#detail").hidden = true; setTimeout(() => $("#apply .close").focus(), 0); }
+function openApply(){ $("#apply").hidden = false; renderPicked(); document.body.style.overflow = "hidden"; if (!$("#detail").hidden) $("#detail").hidden = true; setTimeout(() => $("#apply .close").focus(), 0); }
 function closeApply(){ $("#apply").hidden = true; document.body.style.overflow = ""; }
 document.addEventListener("click", e => {
   const gl = e.target.closest("[data-golabs]"); if (gl){ e.preventDefault(); closeApply(); setTimeout(() => { const t = document.getElementById("labs"); if (t) t.scrollIntoView({ behavior:"smooth" }); }, 50); return; }
