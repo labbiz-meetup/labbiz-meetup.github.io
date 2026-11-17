@@ -853,7 +853,7 @@ html,body{overflow-x:clip}
 <div id="apply" hidden>
   <div class="scrim" data-aclose></div>
   <aside class="panel" role="dialog" aria-modal="true" aria-labelledby="a-title">
-    <div class="p-head"><div class="row"><span class="eyebrow mono">APPLY</span><button class="close" data-aclose aria-label="닫기">×</button></div><h2 id="a-title">상담 신청</h2><div class="who">희망 연구실을 1~3순위로 담고 신청서를 작성해 주세요.</div></div>
+    <div class="p-head"><div class="row"><span class="eyebrow mono">APPLY</span><button class="close" data-aclose aria-label="닫기">×</button></div><h2 id="a-title">상담 신청</h2><div class="who">기업 정보 → 희망 연구실 → 동의·신청 순서로 작성해 주세요.</div></div>
     <div class="p-body ap-split">
       <nav class="apnav" id="apnav" aria-label="신청서 순서"></nav>
       <form id="form" class="apr" novalidate data-v="lab">
@@ -883,9 +883,9 @@ html,body{overflow-x:clip}
                 <label><input type="checkbox" value="기술 자문"> 기술 자문</label>
               </div>
             </fieldset>
-            <label class="f"><span>기업 현황 <span class="req">*</span> <em class="fmin">최소 50자</em></span><textarea id="f-memo" required rows="4" placeholder="우리 회사가 지금 무엇을 하고 있는지 적어 주세요. 예: 주요 제품·고객, 쓰고 있는 기술·공정, 연구 인력·설비(기업부설연구소 등). 연구실과 상담할 내용은 위 희망 연구실마다 따로 적어 주세요."></textarea><small class="fcount" id="f-memo-n" aria-live="polite">0자 / 최소 50자</small><small class="fnote">작성하신 기업 정보와 담당자 성명·직위, 기업 현황, 연구실별 상담 내용은 상담 준비를 위해 신청하신 연구실에 미리 전달됩니다. 영업비밀에 해당하는 내용은 적지 말고 상담 자리에서 말씀해 주세요.</small></label>
+            <label class="f"><span>기업 현황 <span class="req">*</span> <em class="fmin">최소 50자</em></span><textarea id="f-memo" required rows="4" placeholder="우리 회사가 지금 무엇을 하고 있는지 적어 주세요. 예: 주요 제품·고객, 쓰고 있는 기술·공정, 연구 인력·설비(기업부설연구소 등). 연구실과 상담할 내용은 다음 단계에서 연구실마다 따로 적습니다."></textarea><small class="fcount" id="f-memo-n" aria-live="polite">0자 / 최소 50자</small><small class="fnote">작성하신 기업 정보와 담당자 성명·직위, 기업 현황, 연구실별 상담 내용은 상담 준비를 위해 신청하신 연구실에 미리 전달됩니다. 영업비밀에 해당하는 내용은 적지 말고 상담 자리에서 말씀해 주세요.</small></label>
             
-          <div class="pnext"><button type="button" class="btn g" data-go="ok">다음: 동의·신청 →</button></div>
+          <div class="pnext"><button type="button" class="btn g" id="coNext" data-go="lab:">다음: 희망 연구실 →</button></div>
         </section>
         <section class="pane pane-ok">
           <div class="ph-h"><span class="k">동의·신청</span><b>확인 후 신청</b><small>신청하기를 누르면 빠진 항목이 있는지 확인한 뒤 접수됩니다.</small></div><ul class="oksum" id="okSum"></ul>
@@ -1149,17 +1149,17 @@ function renderGrid(){
   }).join("");
   observe($("#grid"));
 }
-let APV = "lab:";
+let APV = "co";
 const labDone = id => selOf(id).f.length > 0 && reqLen(REQ[id]) >= REQ_MIN;
 const coDone = () => ["#f-co","#f-prod","#f-name","#f-tel","#f-mail"].every(s => $(s).value.trim()) && memoLen() >= MEMO_MIN;
 function renderNav(){
   const n = $("#apnav"); if (!n) return;
   const it = (key, top, title, st, cls) => `<button type="button" class="it${APV === key ? " on" : ""}" data-go="${key}"><span class="t">${top}</span><b>${title}</b>${st ? `<span class="p ${cls}">${st}</span>` : ""}</button>`;
-  n.innerHTML = `<span class="sec">희망 연구실</span>` +
+  n.innerHTML = `<span class="sec">1 · 기업</span>` + it("co", "", "기업 정보", coDone() ? "✓ 작성 완료" : "● 미작성", coDone() ? "ok" : "no") +
+    `<span class="sec">2 · 희망 연구실</span>` +
     picked.map((id, i) => it("lab:" + id, `${i+1}순위`, esc(byId(id).lab), labDone(id) ? "✓ 작성 완료" : (selOf(id).f.length || reqLen(REQ[id]) ? "● 작성 중" : "● 미작성"), labDone(id) ? "ok" : "no")).join("") +
     (picked.length < MAX ? `<a class="it add" href="#labs" data-golabs><b>+ ${picked.length ? `${picked.length+1}순위 추가` : "연구실 담기"}</b><span class="t">${picked.length ? "선택" : "1곳 이상 필수"}</span></a>` : "") +
-    `<span class="sec">기업</span>` + it("co", "", "기업 정보", coDone() ? "✓ 작성 완료" : "● 미작성", coDone() ? "ok" : "no") +
-    it("ok", "", "동의·신청", $("#f-agree").checked ? "✓ 동의함" : "", "ok");
+    `<span class="sec">3 · 신청</span>` + it("ok", "", "동의·신청", $("#f-agree").checked ? "✓ 동의함" : "", "ok");
 }
 function showPane(){
   const f = $("#form"); if (!f) return;
@@ -1168,12 +1168,13 @@ function showPane(){
   document.querySelectorAll("#picked > li[data-lab]").forEach(li => li.classList.toggle("cur", li.dataset.lab === cur));
   const lh = $("#labHead");
   if (lh){ if (cur){ const l = byId(cur), i = picked.indexOf(cur); const done = picked.filter(labDone).length; lh.innerHTML = `<span class="k">${i+1}순위 · ${l.id} · ${esc(l.prof)} · ${esc(l.org)}</span><b>${esc(l.lab)}</b><span class="pg"><i style="width:${Math.round(done / picked.length * 100)}%"></i></span><small>희망 연구실 ${picked.length}곳 중 ${done}곳 작성 완료</small>`; } else lh.innerHTML = `<span class="k">희망 연구실</span><b>아직 담은 연구실이 없습니다</b><small>참여 연구실에서 「+ 담기」를 눌러 최대 3곳까지 담아 주세요.</small><p style="margin-top:14px"><a class="btn p" href="#labs" data-golabs>참여 연구실 보기 →</a></p>`; }
-  const nx = $("#labNext"); if (nx){ const i = picked.indexOf(cur); nx.hidden = !cur; nx.textContent = i >= 0 && i < picked.length - 1 ? `다음 연구실: ${byId(picked[i+1]).lab} →` : "다음: 기업 정보 →"; nx.dataset.go = i >= 0 && i < picked.length - 1 ? "lab:" + picked[i+1] : "co"; }
+  const nx = $("#labNext"); if (nx){ const i = picked.indexOf(cur); nx.hidden = !cur; nx.textContent = i >= 0 && i < picked.length - 1 ? `다음 연구실: ${byId(picked[i+1]).lab} →` : "다음: 동의·신청 →"; nx.dataset.go = i >= 0 && i < picked.length - 1 ? "lab:" + picked[i+1] : "ok"; }
+  const cn = $("#coNext"); if (cn) cn.dataset.go = picked.length ? "lab:" + picked[0] : "lab:";
   renderNav(); renderOkSum();
 }
 function renderOkSum(){
   const u = $("#okSum"); if (!u) return;
-  u.innerHTML = picked.map((id, i) => `<li><span>${i+1}순위</span><b>${esc(byId(id).lab)}</b><em class="${labDone(id) ? "ok" : "no"}">${labDone(id) ? "✓ 작성 완료" : "● 작성이 덜 됨"}</em></li>`).join("") + `<li><span>기업</span><b>기업 정보</b><em class="${coDone() ? "ok" : "no"}">${coDone() ? "✓ 작성 완료" : "● 작성이 덜 됨"}</em></li>`;
+  u.innerHTML = `<li><span>기업</span><b>기업 정보</b><em class="${coDone() ? "ok" : "no"}">${coDone() ? "✓ 작성 완료" : "● 작성이 덜 됨"}</em></li>` + picked.map((id, i) => `<li><span>${i+1}순위</span><b>${esc(byId(id).lab)}</b><em class="${labDone(id) ? "ok" : "no"}">${labDone(id) ? "✓ 작성 완료" : "● 작성이 덜 됨"}</em></li>`).join("");
 }
 function goPane(key){ APV = key; showPane(); const b = document.querySelector("#apply .p-body"); if (b) b.scrollTop = 0; const f = $("#form"); if (f) f.scrollTop = 0; }
 document.addEventListener("click", e => { const g = e.target.closest && e.target.closest("button[data-go]"); if (!g) return; e.preventDefault(); $("#err").textContent = ""; goPane(g.dataset.go); });
@@ -1321,12 +1322,14 @@ $("#form").addEventListener("submit", async e => {
   e.preventDefault();
   if (isClosed()){ applyMeta(); return; }
   const need = [["#f-co","기업명"],["#f-prod","주력 제품·사업"],["#f-name","담당자 성명"],["#f-tel","연락처"],["#f-mail","이메일"],["#f-memo","기업 현황"]].filter(([s]) => !$(s).value.trim()).map(([,n]) => n);
+  if (need.length){ goPane("co"); $("#err").textContent = `${need.join(", ")}을(를) 입력해 주세요.`; return; }
+  if (!/^\S+@\S+\.\S+$/.test($("#f-mail").value.trim())){ goPane("co"); $("#err").textContent = "이메일 주소 형식을 확인해 주세요."; return; }
+  if (memoLen() < MEMO_MIN){ goPane("co"); $("#err").textContent = `기업 현황을 ${MEMO_MIN}자 이상 적어 주세요(지금 ${memoLen()}자). 주요 제품, 쓰고 있는 기술·공정, 연구 인력·설비 등을 적어 주세요.`; $("#f-memo").focus(); return; }
   if (!picked.length){ $("#err").textContent = "희망 연구실을 1곳 이상 담아 주세요. 연구실의 「+ 담기」를 누르면 됩니다."; goPane("lab:"); return; }
   const noFld = picked.filter(id => !selOf(id).f.length);
   if (noFld.length){ goPane("lab:" + noFld[0]); $("#err").textContent = `연구실마다 관심 분야를 1개 이상 골라 주세요: ${noFld.map(id => byId(id).lab).join(", ")}.`; const t = document.querySelector(`[data-fd^="${noFld[0]}|"]`); if (t) t.focus(); return; }
   const shortReq = picked.filter(id => reqLen(REQ[id]) < REQ_MIN);
   if (shortReq.length){ goPane("lab:" + shortReq[0]); $("#err").textContent = `연구실별 상담 내용을 ${REQ_MIN}자 이상 적어 주세요: ${shortReq.map(id => byId(id).lab).join(", ")}. 해결하고 싶은 문제와 기대하는 결과를 적어 주시면 연구실이 상담을 미리 준비할 수 있습니다.`; const t = document.querySelector(`[data-req="${shortReq[0]}"]`); if (t) t.focus(); return; }
-  if (need.length){ goPane("co"); $("#err").textContent = `${need.join(", ")}을(를) 입력해 주세요.`; return; }
   if (memoLen() < MEMO_MIN){ goPane("co"); $("#err").textContent = `기업 현황을 ${MEMO_MIN}자 이상 적어 주세요(지금 ${memoLen()}자). 주요 제품, 쓰고 있는 기술·공정, 연구 인력·설비 등을 적어 주세요.`; $("#f-memo").focus(); return; }
   if (!/^\S+@\S+\.\S+$/.test($("#f-mail").value.trim())){ goPane("co"); $("#err").textContent = "이메일 주소 형식을 확인해 주세요."; return; }
   if (!$("#f-agree").checked){ $("#err").textContent = "개인정보 수집·이용에 동의해야 신청할 수 있습니다."; return; }
