@@ -216,6 +216,23 @@ ul.pat a:hover .go{color:var(--sig)}
 .picked{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 .picked li{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
 .picked .rq{flex-basis:100%;display:block;margin:2px 0 4px 38px}
+.picked .sel{flex-basis:100%;margin:2px 0 6px 38px}
+.picked .sel .slh{display:flex;align-items:baseline;gap:8px;font-size:12.5px;font-weight:700;color:var(--muted);margin:8px 0 7px}.picked .sel .slh em{font-style:normal;font-weight:500;color:var(--meta)}.picked .sel .slh small{margin-left:auto;font-size:12px;color:var(--meta)}
+.picked .fk{display:flex;flex-wrap:wrap;gap:6px}
+.picked .fk label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);padding:6px 10px;font-size:13px;color:var(--muted);cursor:pointer;line-height:1.35}
+.picked .fk label b{color:var(--text)}.picked .fk label.on{border-color:var(--sig);background:rgba(255,75,31,.1);color:var(--text)}.picked .fk label.on b{color:var(--sig)}
+.picked .fk input,.picked .pk input{accent-color:var(--sig);margin:0}
+.picked .pks{border:1px solid var(--line);max-height:220px;overflow:auto}
+.picked .pk{display:grid;grid-template-columns:auto auto 1fr;gap:8px;align-items:start;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+.picked .pk:last-child{border-bottom:0}.picked .pk.on{background:rgba(255,75,31,.08)}
+.picked .pk .st{font-size:11px;font-weight:700;padding:1px 6px;border:1px solid var(--line);white-space:nowrap}
+.picked .pk .pn{color:var(--text);line-height:1.45}.picked .pk .pn i{font-style:normal;font-weight:800;color:var(--sig);margin-right:6px}.picked .pk .pn small{display:block;color:var(--meta);font-size:11.5px}
+.picked .ph{margin:0;padding:10px;font-size:12.5px;color:var(--meta)}
+.picked .ex summary{padding:8px 10px;font-size:12.5px;color:var(--muted);cursor:pointer;border-top:1px solid var(--line)}
+ul.pat li{position:relative}ul.pat .star{position:absolute;right:0;bottom:12px;font:inherit;font-size:12px;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--line);padding:4px 9px;cursor:pointer}
+ul.pat .star:hover{color:var(--text);border-color:var(--sig)}ul.pat .star.on{color:#0a0a0b;background:var(--sig);border-color:var(--sig)}
+ul.pat a{padding-bottom:40px!important}
+@media (max-width:640px){.picked .sel{margin-left:0}}
 .picked .rq>span{display:flex;align-items:baseline;gap:8px;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px}
 .picked .rq em{font-style:normal;font-weight:500;color:var(--meta)}.picked .rq small{margin-left:auto;font-size:12px;font-weight:600;color:var(--meta);font-variant-numeric:tabular-nums}.picked .rq small.ok{color:var(--sig)}
 .picked .rq textarea{width:100%;box-sizing:border-box;min-height:64px;resize:vertical;background:transparent;border:1px solid var(--line);color:var(--text);font:inherit;font-size:14px;padding:9px 11px;line-height:1.5}
@@ -803,6 +820,24 @@ const MAX = 3;
 const REQ_MIN = 50;
 const REQ = (() => { try { return JSON.parse(localStorage.getItem("lbm-req") || "{}") || {}; } catch(e){ return {}; } })();
 const reqLen = t => String(t || "").replace(/\s+/g, " ").trim().length;
+const PAT_MAX = 5;
+const SEL = (() => { try { return JSON.parse(localStorage.getItem("lbm-sel") || "{}") || {}; } catch(e){ return {}; } })();
+const selOf = id => (SEL[id] = SEL[id] || { f:[], p:[] });
+const saveSel = () => { try { localStorage.setItem("lbm-sel", JSON.stringify(SEL)); } catch(_){} };
+function selBlock(id){
+  const l = byId(id), sl = selOf(id), F = fieldList(l);
+  const pats = sortPat(l.pat.filter(p => sl.f.includes(p.f) || sl.p.includes(p.a)));
+  const extra = sortPat(l.pat.filter(p => !pats.includes(p)));
+  const pli = p => `<label class="pk${sl.p.includes(p.a) ? " on" : ""}"><input type="checkbox" data-pt="${id}|${esc(p.a)}"${sl.p.includes(p.a) ? " checked" : ""}><span class="st ${p.s === "등록" ? "" : "pub"}">${esc(p.s)}</span><span class="pn">${p.f ? `<i>${p.f}</i>` : ""}${esc(p.t)}<small>${esc(p.a)}</small></span></label>`;
+  return `<div class="sel">
+    <p class="slh">관심 분야 <span class="req">*</span> <em>1개 이상</em></p>
+    <div class="fk">${F.map(([c, t]) => `<label class="${sl.f.includes(c) ? "on" : ""}"><input type="checkbox" data-fd="${id}|${c}"${sl.f.includes(c) ? " checked" : ""}><b>${c}</b>${esc(t)}</label>`).join("")}</div>
+    <p class="slh">관심 특허 <em>선택 · 최대 ${PAT_MAX}건</em><small>${sl.p.length}/${PAT_MAX}</small></p>
+    ${l.pat.length ? `<div class="pks">${pats.length ? pats.map(pli).join("") : `<p class="ph">${sl.f.length ? "고른 분야로 분류된 특허가 없습니다. 다른 분야를 고르거나 아래 목록에서 찾아 주세요." : "관심 분야를 고르면 그 분야의 특허가 여기에 나옵니다."}</p>`}${extra.length ? `<details class="ex"><summary>${F.some(([c]) => !sl.f.includes(c)) ? "다른 분야·그 밖의" : "그 밖의"} 특허 ${extra.length}건</summary>${extra.map(pli).join("")}</details>` : ""}</div>` : `<p class="ph">공개된 특허가 없습니다.</p>`}
+  </div>`;
+}
+function setFld(id, c, on){ const sl = selOf(id); sl.f = sl.f.filter(x => x !== c); if (on) sl.f.push(c); sl.f.sort(); saveSel(); }
+function setPat(id, a, on){ const sl = selOf(id); if (on && !sl.p.includes(a)){ if (sl.p.length >= PAT_MAX) return false; sl.p.push(a); const pt = byId(id).pat.find(x => x.a === a); if (pt && pt.f && !sl.f.includes(pt.f)) setFld(id, pt.f, true); } if (!on) sl.p = sl.p.filter(x => x !== a); saveSel(); return true; }
 const CONTACT = { org:"특허법인 아이엠", name:"황세현 과장", tel:"", mail:"hsh29@iampatent.com" };
 const DEADLINE = "";   // 신청 마감일 "2026-11-23" 형식(그날 23:59까지). 비워 두면 마감 없음
 let SRV_CLOSED = false;
@@ -1003,11 +1038,25 @@ function renderGrid(){
 function renderPicked(){
   document.querySelectorAll("[data-count]").forEach(e => e.textContent = `${picked.length}/${MAX}`);
   const rows = picked.map((id, i) => { const l = byId(id); const rq = REQ[id] || ""; return `<li><span class="rk">${i+1}</span><div class="nm"><b>${esc(l.lab)}</b><span>${l.id} · ${esc(l.prof)} · ${esc(l.org)}</span></div>
-    <div class="ctl"><button class="icon" type="button" data-up="${i}" aria-label="순위 올리기" ${i === 0 ? "disabled" : ""}>↑</button><button class="icon" type="button" data-down="${i}" aria-label="순위 내리기" ${i === picked.length-1 ? "disabled" : ""}>↓</button><button class="icon" type="button" data-rm="${id}" aria-label="빼기">×</button></div><label class="rq"><span>이 연구실과 상담할 내용 <span class="req">*</span> <em>최소 ${REQ_MIN}자</em><small data-reqn="${id}" class="${reqLen(rq) >= REQ_MIN ? "ok" : ""}">${reqLen(rq)}자</small></span><textarea data-req="${id}" rows="3" placeholder="이 연구실과 무엇을 하고 싶은지 적어 주세요. 예: 해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 결과(기술이전·공동연구·자문 등)">${esc(rq)}</textarea></label></li>`; });
+    <div class="ctl"><button class="icon" type="button" data-up="${i}" aria-label="순위 올리기" ${i === 0 ? "disabled" : ""}>↑</button><button class="icon" type="button" data-down="${i}" aria-label="순위 내리기" ${i === picked.length-1 ? "disabled" : ""}>↓</button><button class="icon" type="button" data-rm="${id}" aria-label="빼기">×</button></div>${selBlock(id)}<label class="rq"><span>이 연구실과 상담할 내용 <span class="req">*</span> <em>최소 ${REQ_MIN}자</em><small data-reqn="${id}" class="${reqLen(rq) >= REQ_MIN ? "ok" : ""}">${reqLen(rq)}자</small></span><textarea data-req="${id}" rows="3" placeholder="이 연구실과 무엇을 하고 싶은지 적어 주세요. 예: 해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 결과(기술이전·공동연구·자문 등)">${esc(rq)}</textarea></label></li>`; });
   for (let i = picked.length; i < MAX; i++) rows.push(`<li><span class="slot">${i+1}순위 — 연구실의 「+ 담기」를 눌러 추가</span></li>`);
   $("#picked").innerHTML = rows.join("");
   store.set("lbm-picked", picked);
 }
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-star]"); if (!b) return;
+  e.preventDefault(); const [id, a] = b.dataset.star.split("|");
+  const on = picked.includes(id) && selOf(id).p.includes(a);
+  if (!on && !picked.includes(id)){ toggle(id); if (!picked.includes(id)) return; }
+  if (!setPat(id, a, !on)){ $("#d-note").textContent = `관심 특허는 연구실마다 최대 ${PAT_MAX}건까지 고를 수 있습니다.`; return; }
+  $("#d-note").textContent = !on ? `관심 특허로 담았습니다. 신청서의 이 연구실 칸에 표시됩니다.` : "관심 특허에서 뺐습니다.";
+  renderPicked(); const y = $("#d-body").scrollTop; renderTab(); $("#d-body").scrollTop = y; renderFoot();
+});
+document.addEventListener("change", e => {
+  const d = e.target && e.target.dataset; if (!d) return;
+  if (d.fd){ const [id, c] = d.fd.split("|"); setFld(id, c, e.target.checked); renderPicked(); }
+  else if (d.pt){ const [id, a] = d.pt.split("|"); if (!setPat(id, a, e.target.checked)){ e.target.checked = false; $("#err").textContent = `관심 특허는 연구실마다 최대 ${PAT_MAX}건까지 고를 수 있습니다.`; return; } $("#err").textContent = ""; const op = e.target.closest("details") && e.target.closest("details").open; renderPicked(); if (op){ const dd = document.querySelector(`#picked [data-pt="${d.pt}"]`); if (dd && dd.closest("details")) dd.closest("details").open = true; } }
+});
 document.addEventListener("input", e => {
   const id = e.target && e.target.dataset && e.target.dataset.req; if (!id) return;
   REQ[id] = e.target.value; try { localStorage.setItem("lbm-req", JSON.stringify(REQ)); } catch(_){}
@@ -1072,7 +1121,7 @@ function renderTab(){
     b.innerHTML = `      <div class="pat-stat"><span>전체<b>${l.pat.length}</b></span><span>등록<b>${reg}</b></span><span>공개<b>${l.pat.length - reg}</b></span></div>
       ${groupPat(l).map(([code, title, ps]) => `<p class="pgh">${code ? `<span class="c">${code}</span>` : ""}${esc(title)}<span class="cnt">${ps.length}건</span></p><ul class="pat">${ps.map(p => `<li><a href="${kipris(p.a)}" target="_blank" rel="noopener" title="KIPRIS에서 이 특허 보기"><span class="st ${p.s === "등록" ? "" : "pub"}">${esc(p.s)}</span><span class="pt">${esc(p.t)}</span><span class="go">KIPRIS ↗</span>
         <span class="meta"><span>출원번호 ${esc(p.a)}</span></span>
-        ${p.p ? `<span class="purpose">${esc(p.p)}</span>` : ""}</a></li>`).join("")}</ul>`).join("")}`;
+        ${p.p ? `<span class="purpose">${esc(p.p)}</span>` : ""}</a>${FULL.has(l.id) && !picked.includes(l.id) ? "" : `<button type="button" class="star${picked.includes(l.id) && selOf(l.id).p.includes(p.a) ? " on" : ""}" data-star="${l.id}|${esc(p.a)}">${picked.includes(l.id) && selOf(l.id).p.includes(p.a) ? "★ 관심 특허" : "☆ 관심 특허로 담기"}</button>`}</li>`).join("")}</ul>`).join("")}`;
   }
   b.scrollTop = 0;
 }
@@ -1119,12 +1168,16 @@ async function loadCounts(){
     return FULL;
   }catch(e){ return null; }
 }
+const fldText = id => { if (!id) return ""; const F = Object.fromEntries(fieldList(byId(id))); return selOf(id).f.map(c => `${c}. ${F[c] || ""}`.trim()).join(" / "); };
+const patText = id => { if (!id) return ""; const l = byId(id); return selOf(id).p.map(a => { const p = l.pat.find(x => x.a === a); return p ? `${p.a} ${p.t}` : a; }).join(" / "); };
 $("#form").addEventListener("submit", async e => {
   e.preventDefault();
   if (isClosed()){ applyMeta(); return; }
   const need = [["#f-co","기업명"],["#f-prod","주력 제품·사업"],["#f-name","담당자 성명"],["#f-tel","연락처"],["#f-mail","이메일"],["#f-memo","기업 현황"]].filter(([s]) => !$(s).value.trim()).map(([,n]) => n);
   if (!picked.length){ $("#err").textContent = "희망 연구실을 1곳 이상 담아 주세요. 연구실의 「+ 담기」를 누르면 됩니다."; return; }
   if (need.length){ $("#err").textContent = `${need.join(", ")}을(를) 입력해 주세요.`; return; }
+  const noFld = picked.filter(id => !selOf(id).f.length);
+  if (noFld.length){ $("#err").textContent = `연구실마다 관심 분야를 1개 이상 골라 주세요: ${noFld.map(id => byId(id).lab).join(", ")}.`; const t = document.querySelector(`[data-fd^="${noFld[0]}|"]`); if (t) t.focus(); return; }
   const shortReq = picked.filter(id => reqLen(REQ[id]) < REQ_MIN);
   if (shortReq.length){ $("#err").textContent = `연구실별 상담 내용을 ${REQ_MIN}자 이상 적어 주세요: ${shortReq.map(id => byId(id).lab).join(", ")}. 해결하고 싶은 문제와 기대하는 결과를 적어 주시면 연구실이 상담을 미리 준비할 수 있습니다.`; const t = document.querySelector(`[data-req="${shortReq[0]}"]`); if (t) t.focus(); return; }
   if (memoLen() < MEMO_MIN){ $("#err").textContent = `기업 현황을 ${MEMO_MIN}자 이상 적어 주세요(지금 ${memoLen()}자). 주요 제품, 쓰고 있는 기술·공정, 연구 인력·설비 등을 적어 주세요.`; $("#f-memo").focus(); return; }
@@ -1148,7 +1201,7 @@ $("#form").addEventListener("submit", async e => {
     `담당자: ${v("#f-name")}${v("#f-pos") ? ` / ${v("#f-pos")}` : ""}`,
     `연락처: ${v("#f-tel")} / ${v("#f-mail")}`,
     "희망 연구실:",
-    ...picked.map((id, i) => { const l = byId(id); return `  ${i+1}순위 ${l.id} ${l.lab} (${l.prof}, ${l.org})\n     상담 내용: ${reqLen(REQ[id]) ? REQ[id].trim() : "-"}`; }),
+    ...picked.map((id, i) => { const l = byId(id); return `  ${i+1}순위 ${l.id} ${l.lab} (${l.prof}, ${l.org})\n     관심 분야: ${fldText(id) || "-"}\n     관심 특허: ${patText(id) || "-"}\n     상담 내용: ${reqLen(REQ[id]) ? REQ[id].trim() : "-"}`; }),
     `희망 협력 방식: ${vals("#f-coop").join(", ") || "미선택"}`,
     `기업 현황: ${v("#f-memo")}`,
   ].join("\n");
@@ -1156,6 +1209,8 @@ $("#form").addEventListener("submit", async e => {
     "1순위":picked[0] ? `${picked[0]} ${byId(picked[0]).lab} (${byId(picked[0]).prof})` : "",
     "2순위":picked[1] ? `${picked[1]} ${byId(picked[1]).lab} (${byId(picked[1]).prof})` : "",
     "3순위":picked[2] ? `${picked[2]} ${byId(picked[2]).lab} (${byId(picked[2]).prof})` : "",
+    "1순위분야":fldText(picked[0]), "2순위분야":fldText(picked[1]), "3순위분야":fldText(picked[2]),
+    "1순위특허":patText(picked[0]), "2순위특허":patText(picked[1]), "3순위특허":patText(picked[2]),
     "1순위요청":picked[0] ? (REQ[picked[0]] || "").trim() : "", "2순위요청":picked[1] ? (REQ[picked[1]] || "").trim() : "", "3순위요청":picked[2] ? (REQ[picked[2]] || "").trim() : "",
     협력방식:vals("#f-coop").join(", "), 참석회차:"", 상담내용:v("#f-memo"), 동의:"Y" };
   const btn = e.submitter || $("#form button[type=submit]");
@@ -1165,7 +1220,7 @@ $("#form").addEventListener("submit", async e => {
       .then(() => { $("#result").hidden = false; $("#result").classList.add("ok");
         $("#rhead").textContent = "신청이 접수되었습니다. 입력하신 이메일로 접수 확인 메일을 보내 드렸고, 행사 1주 전에 개인별 상담 시간표를 다시 보내 드립니다. 확인 메일이 오지 않으면 스팸함을 확인하거나 문의처로 알려 주세요.";
         $("#form").querySelectorAll("input,textarea,button").forEach(x => { if (x.id !== "copy") x.disabled = true; });
-        btn.textContent = "접수 완료"; Object.keys(REQ).forEach(k => delete REQ[k]); try { localStorage.removeItem("lbm-req"); } catch(_){} picked = []; renderPicked(); renderGrid(); setTimeout(loadCounts, 1500); })
+        btn.textContent = "접수 완료"; Object.keys(REQ).forEach(k => delete REQ[k]); Object.keys(SEL).forEach(k => delete SEL[k]); try { localStorage.removeItem("lbm-req"); localStorage.removeItem("lbm-sel"); } catch(_){} picked = []; renderPicked(); renderGrid(); setTimeout(loadCounts, 1500); })
       .catch(() => { btn.disabled = false; btn.textContent = "신청하기";
         $("#err").textContent = `네트워크 오류로 접수하지 못했습니다. 잠시 후 다시 시도하거나 아래 내용을 복사해 ${contactText()}(으)로 보내 주세요.`; $("#result").hidden = false; });
   } else { $("#result").hidden = false; }
