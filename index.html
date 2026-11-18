@@ -953,7 +953,7 @@ function selBlock(id){
 function setFld(id, c, on){ const sl = selOf(id); sl.f = sl.f.filter(x => x !== c); if (on) sl.f.push(c); sl.f.sort(); saveSel(); }
 function setPat(id, a, on){ const sl = selOf(id); if (on && !sl.p.includes(a)){ if (sl.p.length >= PAT_MAX) return false; sl.p.push(a); const pt = byId(id).pat.find(x => x.a === a); if (pt && pt.f && !sl.f.includes(pt.f)) setFld(id, pt.f, true); } if (!on) sl.p = sl.p.filter(x => x !== a); saveSel(); return true; }
 const CONTACT = { org:"특허법인 아이엠", name:"황세현 과장", tel:"", mail:"hsh29@iampatent.com" };
-const DEADLINE = "";   // 신청 마감일 "2026-11-23" 형식(그날 23:59까지). 비워 두면 마감 없음
+const DEADLINE = "2026-11-30";   // 신청 마감일 "2026-11-23" 형식(그날 23:59까지). 비워 두면 마감 없음
 let SRV_CLOSED = false;
 const dlLabel = () => { if (!DEADLINE) return ""; const [y, m, d] = DEADLINE.split("-").map(Number); return `${m}. ${d}.(${"일월화수목금토"[new Date(Date.UTC(y, m-1, d)).getUTCDay()]})`; };
 const isClosed = () => SRV_CLOSED || (!!DEADLINE && Date.now() > Date.parse(DEADLINE + "T23:59:59+09:00"));
