@@ -822,6 +822,21 @@ html,body{overflow-x:clip}
 .apr .consent{line-height:1.7;margin-bottom:28px}
 .apr .consent input{margin-top:4px}
 .apr .fcontact{margin-top:16px}
+/* 접수 완료 화면(다음 단계 타임라인) */
+.done h3{font-size:28px;font-weight:900;letter-spacing:-.02em;margin:4px 0 0}.done h3 em{font-style:normal;color:var(--sig)}
+.done .who{font-size:14px;color:var(--muted);margin-top:8px}
+.done ol{list-style:none;margin:28px 0 0;padding:0;position:relative}
+.done ol:before{content:"";position:absolute;left:11px;top:12px;bottom:30px;width:2px;background:var(--line)}
+.done li{position:relative;padding:0 0 24px 42px}
+.done li>i{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+.done li.on>i{background:var(--sig);border-color:var(--sig)}
+.done li>b{display:block;font-size:15.5px;font-weight:800}
+.done li>span{display:block;font-size:13px;color:var(--meta);margin-top:4px;line-height:1.55}
+.done .labs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.done .labs span{font-size:13px;border:1px solid var(--line);padding:7px 11px;color:var(--text)}
+.done .labs em{font-style:normal;color:var(--meta);margin-right:6px}
+.done .ft{margin-top:6px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--meta)}
+.pane-ok.is-done>.ph-h,.pane-ok.is-done>.oksum,.pane-ok.is-done>.consent,.pane-ok.is-done #submitBtn,.pane-ok.is-done .fcontact,.pane-ok.is-done #result{display:none!important}
 </style></head><body><header class="mast"><div class="in"><a class="wordmark" href="#top">Lab–Biz Tech Meetup</a>
 <nav aria-label="페이지 메뉴"><a href="#program">진행 순서</a><a href="#how">참여 방법</a><a href="#labs">참여 연구실</a></nav>
 <a class="btn p sm" href="#apply">상담 신청 <span class="tally" data-count>0/3</span></a></div></header>
@@ -913,10 +928,11 @@ html,body{overflow-x:clip}
           <label class="consent"><input type="checkbox" id="f-agree"> <span>상담 매칭과 일정 안내를 위해 위 정보를 수집·이용하는 데 동의합니다. (수집 항목: 기업명, 업종, 주력 제품·사업, 담당자 성명·연락처·이메일, 기업 현황, 연구실별 상담 내용 / 이용 범위: 기업 정보, 담당자 성명·직위, 기업 현황, 연구실별 상담 내용은 신청한 연구실에 상담 준비용으로 제공 / 보유 기간: 행사 종료 후 1년)</span></label>
             
             <div><button class="btn p" type="submit" id="submitBtn">신청하기</button><p class="fcontact">문의: <span data-contact></span></p></div>
+            <div class="done" id="done" hidden></div>
             <div class="result" id="result" hidden>
               <p id="rhead" class="rhead"></p><pre id="summary"></pre>
               <div class="cta"><button class="btn sm" type="button" id="copy">신청 내용 복사</button><span class="rc" id="copied"></span></div>
-              <p class="hint" id="rhint">접수처 연결 전에는 복사한 신청 내용을 행사 담당자에게 전달해 주세요.</p>
+              <p class="hint" id="rhint">위 신청 내용을 복사해 문의처 메일로 보내 주시면 대신 접수해 드립니다.</p>
             </div>
           
         </section>
@@ -1388,8 +1404,16 @@ $("#form").addEventListener("submit", async e => {
   if (SHEET_URL){
     btn.disabled = true; btn.textContent = "접수 중…";
     fetch(SHEET_URL, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
-      .then(() => { $("#result").hidden = false; $("#result").classList.add("ok");
-        $("#rhead").textContent = "신청이 접수되었습니다. 입력하신 이메일로 접수 확인 메일을 보내 드렸고, 12. 4.(금)까지 개인별 상담 시간표를 다시 보내 드립니다. 확인 메일이 오지 않으면 스팸함을 확인하거나 문의처로 알려 주세요.";
+      .then(() => { $("#result").hidden = true;
+        const labsHtml = picked.map((id, i) => `<span><em>${i+1}순위</em>${esc(byId(id).lab)}</span>`).join("");
+        $("#done").innerHTML = `<h3>신청 <em>완료</em></h3><p class="who">${esc(v("#f-co"))} · ${esc(v("#f-name"))}님</p>
+          <ol><li class="on"><i></i><b>상담 신청 접수</b><span>신청 연구실</span><div class="labs">${labsHtml}</div></li>
+          <li class="on"><i></i><b>접수 확인 메일 발송</b><span>${esc(v("#f-mail"))} · 메일이 오지 않으면 스팸함을 확인해 주세요</span></li>
+          <li><i></i><b>상담 시간표 안내</b><span>12. 4.(금)까지 회차·테이블을 이메일로 안내해 드립니다</span></li>
+          <li><i></i><b>1:1 상담</b><span>2026. 12. 9.(수) 14:00 · GIST 산학협력연구관 로비</span></li></ol>
+          <p class="ft">신청 내용 수정·취소 문의: <span data-contact></span></p>`;
+        $("#done").hidden = false; document.querySelector(".pane-ok").classList.add("is-done"); applyMeta();
+        const pb = document.querySelector("#apply .p-body"); if (pb) pb.scrollTop = 0; const fm = $("#form"); if (fm) fm.scrollTop = 0;
         $("#form").querySelectorAll("input,textarea,button").forEach(x => { if (x.id !== "copy") x.disabled = true; });
         btn.textContent = "접수 완료"; Object.keys(REQ).forEach(k => delete REQ[k]); Object.keys(SEL).forEach(k => delete SEL[k]); try { localStorage.removeItem("lbm-req"); localStorage.removeItem("lbm-sel"); } catch(_){} picked = []; renderPicked(); renderGrid(); setTimeout(loadCounts, 1500); })
       .catch(() => { btn.disabled = false; btn.textContent = "신청하기";
