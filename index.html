@@ -229,6 +229,8 @@ ul.pat a:hover .go{color:var(--sig)}
 .purpose{grid-column:2/4;font-size:13px;color:var(--muted)}
 .p-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 32px;border-top:1px solid var(--line)}
 .p-foot .note{font-size:13px;color:var(--muted)}
+.d-rec{border-top:1px solid var(--line);padding:14px 36px 4px;background:rgba(255,77,46,.04)} .d-rec .rh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 0 10px} .d-rec .rh b{font-size:13px;font-weight:800;color:var(--sig)} .d-rec .rh span{font-size:12px;color:var(--meta)} .d-rec .rl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px} .d-rec .rc2{position:relative;display:flex;flex-direction:column;gap:3px;padding:12px 92px 12px 14px;border:1px solid var(--line);border-top:2px solid var(--fc);background:var(--surf);cursor:pointer;min-width:0} .d-rec .rc2:hover{border-color:rgba(242,242,240,.35);border-top-color:var(--fc)} .d-rec .rw{font-size:12px;color:var(--muted);line-height:1.45} .d-rec .rc2 b{font-size:14.5px;font-weight:800;line-height:1.35} .d-rec .rc2 small{font-size:12px;color:var(--meta)} .d-rec .rc2 .btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);padding:6px 10px;font-size:12.5px} @media (max-width:720px){.d-rec{padding:12px 20px 2px}.d-rec .rl{grid-template-columns:1fr}}
+
 .apply-body{display:grid;gap:28px}
 .picked{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 .picked li{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -897,7 +899,7 @@ html,body{overflow-x:clip}
         <input type="text" id="f-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0">
         <section class="pane pane-lab">
           <div class="ph-h" id="labHead"></div>
-          <ul class="picked" id="picked"></ul><p class="capnote">연구실별 상담은 최대 4건입니다. 신청이 4건 차면 해당 연구실은 접수가 마감됩니다.</p>
+          <ul class="picked" id="picked"></ul><p class="capnote">연구실별 상담은 최대 3건입니다. 신청이 3건 차면 해당 연구실은 접수가 마감됩니다.</p>
           <div class="pnext"><button type="button" class="btn g" id="labNext">다음 →</button></div>
         </section>
         <section class="pane pane-co">
@@ -951,6 +953,7 @@ html,body{overflow-x:clip}
     </div>
     <div class="tabs" role="tablist" id="tabs"></div>
     <div class="p-body" id="d-body" role="tabpanel"></div>
+    <div class="d-rec" id="d-rec" hidden></div>
     <div class="p-foot"><span class="note" id="d-note"></span><button class="btn p sm" id="d-add"></button></div>
   </aside>
 </div>
@@ -1014,7 +1017,8 @@ const RM = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const store = { get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
-let FULL = new Set(), CAP = 4;
+let FULL = new Set(), CAP = 3, COUNTS = {};
+const REC = {"L-01": [["L-05", "희토류 결합 펩타이드(RELP)로 함께 연구해 온 희토류 회수 기술"]], "L-05": [["L-01", "희토류 결합 펩타이드(RELP)로 함께 연구해 온 희토류 회수 기술"], ["L-11", "산업부산물·폐자원에서 유가금속을 회수하는 습식 공정"], ["L-06", "분리막 기반 분리·정제 공정"], ["L-04", "흡착 소재의 계산 스크리닝(MOF·아민 흡착제)"]], "L-11": [["L-05", "제강 슬래그 등 산업부산물의 유가금속 회수"], ["L-07", "LIBS로 금속 스크랩·양극재 성분을 실시간 분석·선별"]], "L-07": [["L-11", "선별한 금속 스크랩·폐양극재의 유가금속 회수"], ["L-09", "반도체·디스플레이 미세 공정의 광학 검사·계측"]], "L-09": [["L-07", "반도체·디스플레이 미세 공정의 레이저 가공"]], "L-06": [["L-05", "이온선택성 막·전기투석 기반 리튬 분리"]], "L-03": [["L-08", "게임·VR 콘텐츠의 실시간 실감 렌더링"]], "L-08": [["L-03", "게임·VR 인터랙션과 AI 에이전트"]], "L-04": [["L-05", "흡착 소재의 계산 스크리닝(MOF·아민 흡착제)"]]};
 let field = "전체", query = "", picked = store.get("lbm-picked", []).filter(id => LABS.some(l => l.id === id)).slice(0, MAX);
 const byId = id => LABS.find(l => l.id === id);
 const kwOf = l => l.fields.map(s => s.replace(/^[A-Z]\.\s*/, "").replace(/\s*\([^)]*[a-zA-Z][^)]*\)\s*$/, ""));
@@ -1317,6 +1321,16 @@ function renderFoot(){
   $("#d-add").disabled = full;
   $("#d-add").textContent = on ? "신청 목록에서 빼기" : full ? "접수 마감" : "+ 상담 신청 목록에 담기";
   $("#d-note").textContent = on ? `희망 ${picked.indexOf(cur.id)+1}순위로 담겨 있습니다.` : full ? `상담 신청이 ${CAP}건 차서 접수가 마감되었습니다.` : `담은 연구실 ${picked.length}/${MAX}`;
+  renderRec();
+}
+function renderRec(){
+  const box = $("#d-rec"); if (!box) return;
+  const on = cur && picked.includes(cur.id);
+  const list = on && picked.length < MAX ? (REC[cur.id] || []).map((r, i) => [r, i]).filter(([[id]]) => byId(id) && !picked.includes(id) && !FULL.has(id))
+    .sort((a, b) => ((COUNTS[a[0][0]] || 0) - (COUNTS[b[0][0]] || 0)) || a[1] - b[1]).slice(0, 2).map(x => x[0]) : [];
+  box.hidden = !list.length; if (!list.length){ box.innerHTML = ""; return; }
+  box.innerHTML = `<p class="rh"><b>관련 기술을 보유한 연구실</b><span>${MAX - picked.length}곳 더 담을 수 있습니다</span></p><div class="rl">${list.map(([id, why]) => { const l = byId(id);
+    return `<div class="rc2" data-card="${l.id}" role="button" tabindex="0" style="--fc:${FC[l.f] || "#ff4d2e"}"><span class="rw">${esc(why)}</span><b>${esc(l.lab)}</b><small>${esc(l.prof)} 교수 · ${esc(l.org)}</small><button type="button" class="btn sm" data-add="${l.id}">+ 담기</button></div>`; }).join("")}</div>`;
 }
 function openDetail(id, push = true){
   cur = byId(id); if (!cur) return;
@@ -1348,7 +1362,7 @@ async function loadCounts(){
     const r = await fetch(SHEET_URL + "?counts=1&t=" + Date.now(), { cache:"no-store" });
     const j = await r.json();
     if (!j || !j.counts) return null;
-    CAP = +j.cap || CAP; if (j.closed){ SRV_CLOSED = true; applyMeta(); }
+    CAP = +j.cap || CAP; COUNTS = j.counts || {}; if (j.closed){ SRV_CLOSED = true; applyMeta(); }
     FULL = new Set(Object.keys(j.counts).filter(id => j.counts[id] >= CAP));
     renderGrid(); if (!$("#detail").hidden && cur) renderFoot();
     return FULL;
@@ -1437,6 +1451,8 @@ document.addEventListener("click", e => {
   e.preventDefault(); a.hasAttribute("data-aclose") ? closeApply() : openApply();
 });
 
+/* 추천 연구실: 담기 후 갱신 */
+const __toggle = toggle; toggle = function(id){ __toggle(id); if (!$("#detail").hidden && cur) renderFoot(); };
 /* events */
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-f],[data-add],[data-up],[data-down],[data-rm],[data-close],[data-tab],#d-add,[data-card]");
