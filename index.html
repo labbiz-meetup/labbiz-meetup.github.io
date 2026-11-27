@@ -229,6 +229,9 @@ ul.pat a:hover .go{color:var(--sig)}
 .purpose{grid-column:2/4;font-size:13px;color:var(--muted)}
 .p-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 32px;border-top:1px solid var(--line)}
 .p-foot .note{font-size:13px;color:var(--muted)}
+#tip{position:fixed;z-index:9999;max-width:300px;padding:9px 12px;background:#f2f2f0;color:#0a0a0b;font-size:13px;line-height:1.55;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s} #tip.on{opacity:1;transform:none} #tip::after{content:"";position:absolute;left:var(--ax,20px);top:100%;border:6px solid transparent;border-top-color:#f2f2f0} #tip.below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#f2f2f0}
+.tipq{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:6px;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--muted);font-size:11px;font-weight:800;line-height:1;cursor:help;vertical-align:middle;padding:0} .tipq:hover,.tipq:focus-visible{border-color:var(--sig);color:var(--sig);outline:none}
+
 .d-rec{background:#f2f2f0;color:#0a0a0b;padding:16px 36px 8px} .d-rec .rh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 0 2px} .d-rec .rh b{font-size:12px;font-weight:800;letter-spacing:.12em;color:#e8401f} .d-rec .rh span{font-size:12.5px;color:#6b6b6e} .d-rec .ri{display:grid;grid-template-columns:44px 1fr auto;align-items:baseline;gap:4px 12px;padding:10px 0;border-bottom:1px solid #d6d6d2;cursor:pointer} .d-rec .ri:last-child{border-bottom:0} .d-rec .ri:hover b,.d-rec .ri:focus-visible b{text-decoration:underline;text-underline-offset:4px} .d-rec .ri .n{font-family:var(--disp);font-size:26px;color:#e8401f;line-height:1} .d-rec .ri b{font-size:16px;font-weight:900;color:#0a0a0b;line-height:1.4} .d-rec .ri b small{font-size:13px;font-weight:700;color:#55555a;margin-left:6px} .d-rec .ri .rw{grid-column:2;font-size:13.5px;color:#4a4a4f;line-height:1.55} .d-rec .ri button{grid-row:1/span 2;grid-column:3;align-self:center;background:none;border:0;padding:6px 2px;color:#0a0a0b;font-weight:800;font-size:14px;text-decoration:underline;text-decoration-color:#e8401f;text-decoration-thickness:2px;text-underline-offset:5px;cursor:pointer;white-space:nowrap} @media (max-width:720px){.d-rec{padding:14px 20px 6px}.d-rec .rh span{display:none}.d-rec .ri{grid-template-columns:30px 1fr auto}.d-rec .ri .n{font-size:20px}.d-rec .ri b{font-size:15px}.d-rec .ri b small{display:block;margin:2px 0 0}}
 
 .apply-body{display:grid;gap:28px}
@@ -914,7 +917,7 @@ html,body{overflow-x:clip}
               <label class="f"><span>연락처 <span class="req">*</span></span><input id="f-tel" required type="tel" autocomplete="tel"></label>
               <label class="f"><span>이메일 <span class="req">*</span></span><input id="f-mail" required type="email" autocomplete="email"></label>
             </div>
-            <fieldset><legend>희망 협력 방식</legend>
+            <fieldset><legend>희망 협력 방식<button type="button" class="tipq" data-tip="기술이전: 연구실 특허·기술을 이전받거나 실시권을 얻는 방식 · 공동연구: 연구실과 함께 과제·개발을 수행 · 기술 자문: 제품·공정 문제에 전문가 조언을 받는 방식" aria-label="도움말: 기술이전: 연구실 특허·기술을 이전받거나 실시권을 얻는 방식 · 공동연구: 연구실과 함께 과제·개발을 수행 · 기술 자문: 제품·공정 문제에 전문가 조언을 받는 방식">?</button></legend>
               <div class="checks" id="f-coop">
                 <label><input type="checkbox" value="기술이전"> 기술이전</label>
                 <label><input type="checkbox" value="공동연구"> 공동연구</label>
@@ -984,9 +987,9 @@ function selBlock(id){
   const extra = sortPat(l.pat.filter(p => !pats.includes(p)));
   const pli = p => `<label class="pk${sl.p.includes(p.a) ? " on" : ""}"><input type="checkbox" data-pt="${id}|${esc(p.a)}"${sl.p.includes(p.a) ? " checked" : ""}><i class="ck" aria-hidden="true"></i><span class="st ${p.s === "등록" ? "reg" : "pub"}">${esc(p.s)}</span><span class="pn">${p.f ? `<i>${p.f}</i>` : ""}${esc(p.t)}<small>${esc(p.a)}</small></span></label>`;
   return `<div class="sel">
-    <p class="slh"><span class="sn">①</span>관심 분야 <span class="req">*</span> <em>1개 이상</em></p>
+    <p class="slh"><span class="sn">①</span>관심 분야 <span class="req">*</span> <em>1개 이상</em><button type="button" class="tipq" data-tip="상담하고 싶은 기술 분야를 고르세요. 분야마다 연구실이 보유한 기술이 한 줄로 적혀 있고, 고른 분야의 특허가 아래 ②에 나옵니다." aria-label="도움말: 상담하고 싶은 기술 분야를 고르세요. 분야마다 연구실이 보유한 기술이 한 줄로 적혀 있고, 고른 분야의 특허가 아래 ②에 나옵니다.">?</button></p>
     <div class="fk">${F.map(([c, t]) => `<label class="${sl.f.includes(c) ? "on" : ""}"><input type="checkbox" data-fd="${id}|${c}"${sl.f.includes(c) ? " checked" : ""}><i class="ck" aria-hidden="true"></i><b>${c}</b><span class="fd">${esc(t)}${(l.own||{})[c] ? `<small>${esc(l.own[c])}</small>` : ""}</span></label>`).join("")}</div>
-    <p class="slh"><span class="sn">②</span>관심 특허 <em>선택 · 최대 ${PAT_MAX}건</em><small class="${sl.p.length ? "ok" : ""}">${sl.p.length}/${PAT_MAX} 선택</small></p>
+    <p class="slh"><span class="sn">②</span>관심 특허 <em>선택 · 최대 ${PAT_MAX}건</em><button type="button" class="tipq" data-tip="구체적으로 묻고 싶은 특허가 있으면 고르세요. 고르지 않아도 신청할 수 있습니다." aria-label="도움말: 구체적으로 묻고 싶은 특허가 있으면 고르세요. 고르지 않아도 신청할 수 있습니다.">?</button><small class="${sl.p.length ? "ok" : ""}">${sl.p.length}/${PAT_MAX} 선택</small></p>
     ${l.pat.length ? `<div class="pks">${pats.length ? pats.map(pli).join("") : `<p class="ph">${sl.f.length ? "고른 분야로 분류된 특허가 없습니다. 다른 분야를 고르거나 아래 목록에서 찾아 주세요." : "관심 분야를 고르면 그 분야의 특허가 여기에 나옵니다."}</p>`}${extra.length ? `<details class="ex"><summary>${F.some(([c]) => !sl.f.includes(c)) ? "다른 분야·그 밖의" : "그 밖의"} 특허 ${extra.length}건</summary>${extra.map(pli).join("")}</details>` : ""}</div>` : `<p class="ph">공개된 특허가 없습니다.</p>`}
   </div>`;
 }
@@ -1225,7 +1228,7 @@ document.addEventListener("change", () => { if (!$("#apply").hidden) setTimeout(
 function renderPicked(){
   document.querySelectorAll("[data-count]").forEach(e => e.textContent = `${picked.length}/${MAX}`);
   const rows = picked.map((id, i) => { const l = byId(id); const rq = REQ[id] || ""; return `<li data-lab="${id}"><span class="rk">${i+1}</span><div class="nm"><b>${esc(l.lab)}</b><span>${l.id} · ${esc(l.prof)} · ${esc(l.org)}</span></div>
-    <div class="ctl"><button class="icon" type="button" data-up="${i}" aria-label="순위 올리기" ${i === 0 ? "disabled" : ""}>↑</button><button class="icon" type="button" data-down="${i}" aria-label="순위 내리기" ${i === picked.length-1 ? "disabled" : ""}>↓</button><button class="icon" type="button" data-rm="${id}" aria-label="빼기">×</button></div>${selBlock(id)}<label class="rq"><span><span class="sn">③</span>이 연구실과 상담할 내용 <span class="req">*</span> <em>최소 ${REQ_MIN}자</em><small data-reqn="${id}" class="${reqLen(rq) >= REQ_MIN ? "ok" : ""}">${reqLen(rq)}자</small></span><textarea data-req="${id}" rows="3" placeholder="이 연구실과 무엇을 하고 싶은지 적어 주세요. 예: 해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 결과(기술이전·공동연구·자문 등)">${esc(rq)}</textarea></label></li>`; });
+    <div class="ctl"><button class="icon" type="button" data-up="${i}" aria-label="순위 올리기" ${i === 0 ? "disabled" : ""}>↑</button><button class="icon" type="button" data-down="${i}" aria-label="순위 내리기" ${i === picked.length-1 ? "disabled" : ""}>↓</button><button class="icon" type="button" data-rm="${id}" aria-label="빼기">×</button></div>${selBlock(id)}<label class="rq"><span><span class="sn">③</span>이 연구실과 상담할 내용 <span class="req">*</span> <em>최소 ${REQ_MIN}자</em><button type="button" class="tipq" data-tip="해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 협력을 적어 주세요. 연구실에 미리 전달되어 상담을 준비합니다." aria-label="도움말: 해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 협력을 적어 주세요. 연구실에 미리 전달되어 상담을 준비합니다.">?</button><small data-reqn="${id}" class="${reqLen(rq) >= REQ_MIN ? "ok" : ""}">${reqLen(rq)}자</small></span><textarea data-req="${id}" rows="3" placeholder="이 연구실과 무엇을 하고 싶은지 적어 주세요. 예: 해결하고 싶은 문제, 확인하고 싶은 특허·성과, 기대하는 결과(기술이전·공동연구·자문 등)">${esc(rq)}</textarea></label></li>`; });
   for (let i = picked.length; i < MAX; i++) rows.push(`<li class="empty"><span class="rk">${i+1}</span><span class="slot">${i+1}순위 연구실을 더 담을 수 있습니다 <small>(선택)</small></span><a class="addlab" href="#labs" data-golabs>+ 연구실 둘러보기</a></li>`);
   $("#picked").innerHTML = rows.join("");
   store.set("lbm-picked", picked);
@@ -1453,6 +1456,55 @@ document.addEventListener("click", e => {
 });
 
 /* 추천 연구실: 담기 후 갱신 */
+/* 사용 설명 말풍선: 마우스를 올리면(휴대폰은 ? 를 누르면) 표시 */
+(() => {
+  const TIPS = [
+    [".tipq", el => el.dataset.tip],
+    [".chip", el => el.dataset.f === "전체" ? "모든 연구실을 봅니다" : `${el.dataset.f} 분야 연구실만 봅니다`],
+    [".search", () => "연구실·교수·기술·특허명과 응용 분야로 찾을 수 있습니다. 예: 배터리, 폐수, 반도체, 검사"],
+    [".mast .btn", () => "담은 연구실로 상담 신청서를 작성합니다 (최대 3곳)"],
+    [".lab .add", el => el.disabled ? "신청이 3건 차서 접수가 마감된 연구실입니다" : el.getAttribute("aria-pressed") === "true" ? "신청 목록에서 뺍니다" : "상담 신청 목록에 담습니다. 최대 3곳까지, 담은 순서가 희망 순위가 됩니다"],
+    [".lab .nums", () => "등록 특허 · 논문 · 국가R&D 과제 건수 (2020년 이후 기준)"],
+    [".lab .tg", () => "연구실의 대표 기술 키워드"],
+    [".lab h3", () => "누르면 연구실 소개·보유 기술·특허·과제를 볼 수 있습니다"],
+    ['.tab[data-tab="field"]', () => "연구 분야와 특허·논문·과제 요약"],
+    ['.tab[data-tab="tech"]', () => "분야별 보유 기술, 해결 과제와 기존 대비 성과, 근거 논문·특허"],
+    ['.tab[data-tab="pat"]', () => "등록·공개 특허 목록. 누르면 KIPRIS 공보로 연결됩니다"],
+    ['.tab[data-tab="rnd"]', () => "2020년 이후 연구책임으로 수행한 국가R&D 과제"],
+    [".fxo", () => "이 분야에서 연구실이 보유한 핵심 기술"],
+    [".fxs", () => "연구실이 풀어 온 문제와, 기존 방식보다 나아진 성과"],
+    [".fxd>summary", () => "세부 기술 원리, 검증 수치, 주요 논문, 관련 특허를 펼쳐 봅니다"],
+    ["#d-add", el => el.disabled ? "신청이 3건 차서 접수가 마감된 연구실입니다" : /빼기/.test(el.textContent) ? "신청 목록에서 뺍니다" : "이 연구실을 상담 신청 목록에 담습니다"],
+    [".d-rec .ri button", () => "이 연구실도 신청 목록에 담습니다"],
+    [".d-rec .ri", () => "누르면 이 연구실의 상세 정보를 봅니다"],
+    ["[data-up]", () => "희망 순위를 한 단계 올립니다"],
+    ["[data-down]", () => "희망 순위를 한 단계 내립니다"],
+    ["[data-rm]", () => "이 연구실을 신청 목록에서 뺍니다"],
+    ["#f-coop label", el => ({"기술이전":"연구실 특허·기술을 이전받거나 실시권을 얻는 방식","공동연구":"연구실과 함께 과제·개발을 수행하는 방식","기술 자문":"제품·공정 문제에 대해 전문가 조언을 받는 방식"})[(el.querySelector("input")||{}).value] || ""],
+  ];
+  const SEL = TIPS.map(t => t[0]).join(",");
+  const tip = document.createElement("div"); tip.id = "tip"; tip.setAttribute("role", "tooltip"); document.body.appendChild(tip);
+  let curEl = null;
+  const textFor = el => { for (const [sel, fn] of TIPS) if (el.matches(sel)) return fn(el); return ""; };
+  const show = el => {
+    const t = textFor(el); if (!t){ hide(); return; }
+    curEl = el; tip.textContent = t; tip.classList.add("on");
+    const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8);
+    let y = r.top - h - 10, below = false; if (y < 8){ y = r.bottom + 10; below = true; }
+    tip.classList.toggle("below", below); tip.style.left = x + "px"; tip.style.top = y + "px";
+    tip.style.setProperty("--ax", Math.min(Math.max(12, r.left + r.width / 2 - x - 6), w - 24) + "px");
+  };
+  const hide = () => { curEl = null; tip.classList.remove("on"); };
+  const hover = matchMedia("(hover:hover)").matches;
+  if (hover){
+    document.addEventListener("mouseover", e => { const el = e.target.closest(SEL); if (el !== curEl) el ? show(el) : hide(); });
+    document.addEventListener("focusin", e => { const el = e.target.closest(SEL); el ? show(el) : hide(); });
+  }
+  document.addEventListener("click", e => { const q = e.target.closest(".tipq"); if (q){ e.preventDefault(); e.stopPropagation(); curEl === q && tip.classList.contains("on") ? hide() : show(q); } else if (!hover) hide(); }, true);
+  addEventListener("scroll", hide, true); addEventListener("resize", hide);
+})();
+
 const __toggle = toggle; toggle = function(id){ __toggle(id); if (!$("#detail").hidden && cur) renderFoot(); };
 /* events */
 document.addEventListener("click", e => {
